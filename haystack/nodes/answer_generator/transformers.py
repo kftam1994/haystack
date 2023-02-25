@@ -482,7 +482,7 @@ class Seq2SeqGenerator(BaseGenerator):
             temperature=1.0,
             eos_token_id=self.tokenizer.eos_token_id,
             no_repeat_ngram_size=0,
-            um_return_sequences=top_k,
+            num_return_sequences=top_k,
             decoder_start_token_id=self.tokenizer.bos_token_id
         )
 
