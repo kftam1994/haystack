@@ -342,8 +342,8 @@ class Seq2SeqGenerator(BaseGenerator):
         model_name_or_path: str,
         input_converter: Optional[Callable] = None,
         top_k: int = 1,
-        max_length: int = 200,
-        min_length: int = 2,
+        max_length: int = None,
+        min_length: int = None,
         num_beams: int = 8,
         use_gpu: bool = True,
         progress_bar: bool = True,
@@ -455,21 +455,35 @@ class Seq2SeqGenerator(BaseGenerator):
                 f"top_k: Optional[int] = None) -> BatchEncoding:"
             )
 
+        # generated_answers_encoded = self.model.generate(
+        #     input_ids=query_and_docs_encoded["input_ids"],
+        #     attention_mask=query_and_docs_encoded["attention_mask"],
+        #     min_length=self.min_length,
+        #     max_length=self.max_length,
+        #     do_sample=True if self.num_beams == 1 else False,
+        #     early_stopping=True,
+        #     num_beams=self.num_beams,
+        #     temperature=1.0,
+        #     top_k=None,
+        #     top_p=None,
+        #     eos_token_id=self.tokenizer.eos_token_id,
+        #     no_repeat_ngram_size=3,
+        #     num_return_sequences=top_k,
+        #     decoder_start_token_id=self.tokenizer.bos_token_id,
+        # )
         generated_answers_encoded = self.model.generate(
             input_ids=query_and_docs_encoded["input_ids"],
             attention_mask=query_and_docs_encoded["attention_mask"],
             min_length=self.min_length,
             max_length=self.max_length,
             do_sample=True if self.num_beams == 1 else False,
-            early_stopping=True,
+            early_stopping=False,
             num_beams=self.num_beams,
             temperature=1.0,
-            top_k=None,
-            top_p=None,
             eos_token_id=self.tokenizer.eos_token_id,
-            no_repeat_ngram_size=3,
-            num_return_sequences=top_k,
-            decoder_start_token_id=self.tokenizer.bos_token_id,
+            no_repeat_ngram_size=0,
+            um_return_sequences=top_k,
+            decoder_start_token_id=self.tokenizer.bos_token_id
         )
 
         generated_answers = self.tokenizer.batch_decode(generated_answers_encoded, skip_special_tokens=True)
