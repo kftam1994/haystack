@@ -306,11 +306,14 @@ class HFLocalInvocationLayer(PromptModelInvocationLayer):
         torch_dtype = model_input_kwargs.get("torch_dtype")
         if torch_dtype is not None:
             if isinstance(torch_dtype, str):
-                if "torch." not in torch_dtype:
+                if "torch." in torch_dtype:
+                    torch_dtype_resolved = getattr(torch, torch_dtype.strip("torch."))
+                elif torch_dtype == "auto":
+                    torch_dtype_resolved = torch_dtype
+                else:
                     raise ValueError(
-                        f"torch_dtype should be a torch.dtype or a string with 'torch.' prefix, got {torch_dtype}"
+                        f"torch_dtype should be a torch.dtype, a string with 'torch.' prefix or the string 'auto', got {torch_dtype}"
                     )
-                torch_dtype_resolved = getattr(torch, torch_dtype.strip("torch."))
             elif isinstance(torch_dtype, torch.dtype):
                 torch_dtype_resolved = torch_dtype
             else:
@@ -701,7 +704,7 @@ def get_predefined_prompt_templates() -> List[PromptTemplate]:
             "Use the following format:\n\n"
             "Question: the question to be answered\n"
             "Thought: Reason if you have the final answer. If yes, answer the question. If not, find out the missing information needed to answer it.\n"
-            "Tool: [$tool_names]\n"
+            "Tool: pick one of $tool_names \n"
             "Tool Input: the input for the tool\n"
             "Observation: the tool will respond with the result\n"
             "...\n"
