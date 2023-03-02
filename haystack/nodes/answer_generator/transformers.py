@@ -344,7 +344,7 @@ class Seq2SeqGenerator(BaseGenerator):
         top_k: int = 1,
         max_length: int = 1024,
         min_length: int = None,
-        num_beams: int = 64,
+        num_beams: int = 32,
         use_gpu: bool = True,
         progress_bar: bool = True,
         use_auth_token: Optional[Union[str, bool]] = None,
