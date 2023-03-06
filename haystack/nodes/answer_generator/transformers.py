@@ -344,7 +344,13 @@ class Seq2SeqGenerator(BaseGenerator):
         top_k: int = 1,
         max_length: int = 1024,
         min_length: int = None,
-        num_beams: int = 32,
+        num_beams: int = None,
+        early_stopping=False,
+        do_sample=True,
+        no_repeat_ngram_size=2,
+        penalty_alpha=None,
+        temperature=1.0,
+        top_k_param=None,
         use_gpu: bool = True,
         progress_bar: bool = True,
         use_auth_token: Optional[Union[str, bool]] = None,
@@ -378,6 +384,12 @@ class Seq2SeqGenerator(BaseGenerator):
         self.max_length = max_length
         self.min_length = min_length
         self.num_beams = num_beams
+        self.early_stopping=early_stopping
+        self.do_sample=do_sample
+        self.no_repeat_ngram_size=no_repeat_ngram_size
+        self.penalty_alpha=penalty_alpha
+        self.temperature=temperature
+        self.top_k_param=top_k_param
 
         if top_k > self.num_beams:
             top_k = self.num_beams
@@ -481,14 +493,16 @@ class Seq2SeqGenerator(BaseGenerator):
             attention_mask=query_and_docs_encoded["attention_mask"],
             min_length=self.min_length,
             max_length=self.max_length,
-            do_sample=True,
-            early_stopping=False,
+            do_sample=self.do_sample,
+            early_stopping=self.early_stopping,
             num_beams=self.num_beams,
-            temperature=1.0,
+            temperature=self.temperature,
             eos_token_id=self.tokenizer.eos_token_id,
-            no_repeat_ngram_size=0,
+            no_repeat_ngram_size=self.no_repeat_ngram_size,
             num_return_sequences=top_k,
-            decoder_start_token_id=self.tokenizer.bos_token_id
+            decoder_start_token_id=self.tokenizer.bos_token_id,
+            top_k_=self.top_k_param,
+            penalty_alpha=self.penalty_alpha
         )
 
         generated_answers = self.tokenizer.batch_decode(generated_answers_encoded, skip_special_tokens=True)
