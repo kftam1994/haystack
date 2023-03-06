@@ -501,7 +501,7 @@ class Seq2SeqGenerator(BaseGenerator):
             no_repeat_ngram_size=self.no_repeat_ngram_size,
             num_return_sequences=top_k,
             decoder_start_token_id=self.tokenizer.bos_token_id,
-            top_k_=self.top_k_param,
+            top_k=self.top_k_param,
             penalty_alpha=self.penalty_alpha
         )
 
