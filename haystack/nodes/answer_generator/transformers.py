@@ -355,6 +355,8 @@ class Seq2SeqGenerator(BaseGenerator):
         progress_bar: bool = True,
         use_auth_token: Optional[Union[str, bool]] = None,
         devices: Optional[List[Union[str, torch.device]]] = None,
+        device_map=None,
+        torch_dtype=None
     ):
         """
         :param model_name_or_path: a HF model name for auto-regressive language model like GPT2, XLNet, XLM, Bart, T5 etc
@@ -408,7 +410,10 @@ class Seq2SeqGenerator(BaseGenerator):
         Seq2SeqGenerator._register_converters(model_name_or_path, input_converter)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, use_auth_token=use_auth_token)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name_or_path, use_auth_token=use_auth_token)
+        if device_map is None and torch_dtype is None:
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name_or_path, use_auth_token=use_auth_token)
+        else:
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name_or_path, use_auth_token=use_auth_token,device_map=device_map,torch_dtype=torch_dtype)
         self.model.to(str(self.devices[0]))
         self.model.eval()
 
